@@ -7,57 +7,123 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
-        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8fafc; touch-action: manipulation; }
-        .hidden { display: none; }
-        .quiz-card { width: 100%; max-width: 600px; margin: 0 auto; background: white; min-height: 100vh; display: flex; flex-direction: column; }
-        @media (min-width: 640px) { .quiz-card { min-height: auto; margin-top: 2rem; margin-bottom: 2rem; border-radius: 1.5rem; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); } }
+        
+        body { 
+            font-family: 'Noto Sans KR', sans-serif; 
+            background-color: #f8fafc; 
+            touch-action: manipulation;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .hidden { display: none !important; }
+        
+        /* 모바일에서는 꽉 차게, PC에서는 카드 형태로 */
+        .quiz-card { 
+            width: 100%; 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background: white; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            position: relative;
+        }
+        
+        @media (min-width: 640px) { 
+            .quiz-card { 
+                min-height: 700px; 
+                height: auto;
+                margin-top: 2rem; 
+                margin-bottom: 2rem; 
+                border-radius: 1.5rem; 
+                box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); 
+            } 
+        }
+
         .progress-bar { transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        @keyframes slideUp { 
+            from { opacity: 0; transform: translateY(20px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
         .animate-slide-up { animation: slideUp 0.4s ease forwards; }
+
+        /* 터치 피드백 */
+        button:active { transform: scale(0.98); }
+        input:focus { font-size: 16px; } /* iOS 자동 줌 방지 */
     </style>
 </head>
 <body class="bg-slate-50">
-    <div class="quiz-card shadow-lg">
+    <div class="quiz-card">
         <!-- 시작 화면 -->
-        <div id="setup-screen" class="p-10 text-center">
-            <h1 class="text-3xl font-black text-slate-800 mb-4">DB 주관식 마스터</h1>
-            <p class="text-slate-500 mb-8 text-sm">3장~6장 핵심 이론 및 예상 문제<br>총 400+ 문항 풀에서 랜덤 10문제 추출</p>
-            <button onclick="startQuiz()" class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold text-lg shadow-lg hover:bg-indigo-700 transition-all">학습 시작하기</button>
+        <div id="setup-screen" class="p-8 text-center flex flex-col justify-center flex-grow">
+            <div class="mb-6 inline-block p-4 bg-indigo-50 rounded-2xl mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                </svg>
+            </div>
+            <h1 class="text-3xl font-black text-slate-800 mb-4 tracking-tight">DB 주관식 마스터</h1>
+            <p class="text-slate-500 mb-10 text-sm leading-relaxed">
+                3장~6장 핵심 이론 및 예상 문제<br>
+                총 400+ 문항 풀에서 랜덤 10문제 추출
+            </p>
+            <button onclick="startQuiz()" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-bold text-lg shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all">
+                학습 시작하기
+            </button>
         </div>
 
         <!-- 퀴즈 화면 -->
         <div id="quiz-screen" class="hidden flex flex-col flex-grow">
-            <div class="h-1.5 w-full bg-slate-100"><div id="progress-bar" class="progress-bar h-full bg-indigo-500 w-0"></div></div>
-            <div class="px-6 py-4 flex justify-between items-center border-b border-slate-100">
+            <div class="h-1.5 w-full bg-slate-100">
+                <div id="progress-bar" class="progress-bar h-full bg-indigo-500 w-0"></div>
+            </div>
+            
+            <div class="px-6 py-4 flex justify-between items-center border-b border-slate-50">
                 <span class="text-[10px] font-black uppercase tracking-widest bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded">DATABASE</span>
                 <span id="progress-text" class="text-xs font-bold text-slate-400">01 / 10</span>
-                <button onclick="location.reload()" class="text-slate-400">✕</button>
+                <button onclick="location.reload()" class="p-2 text-slate-300 hover:text-slate-500 transition">✕</button>
             </div>
-            <div class="p-6 flex-grow">
-                <h2 id="q-text" class="text-lg font-bold text-slate-800 leading-snug mb-6"></h2>
-                <input type="text" id="ans-input" autocomplete="off" placeholder="정답 입력" class="w-full p-4 border-2 border-slate-200 rounded-xl outline-none focus:border-indigo-500">
+
+            <div class="p-6 flex-grow flex flex-col justify-center">
+                <div class="bg-slate-50 p-5 rounded-2xl mb-8 border border-slate-100">
+                    <h2 id="q-text" class="text-xl font-bold text-slate-800 leading-snug"></h2>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-slate-400 ml-1">ANSWER</label>
+                    <input type="text" id="ans-input" autocomplete="off" placeholder="정답을 입력하세요" 
+                           class="w-full p-5 border-2 border-slate-200 rounded-2xl outline-none focus:border-indigo-500 focus:bg-white bg-slate-50 transition-all text-lg">
+                </div>
             </div>
+
             <div class="p-6 bg-white border-t border-slate-100">
-                <button onclick="handleNext()" id="action-btn" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold">다음 문제</button>
+                <button onclick="handleNext()" id="action-btn" class="w-full bg-slate-900 text-white py-5 rounded-2xl font-bold text-lg shadow-lg active:bg-black transition-colors">
+                    다음 문제
+                </button>
             </div>
         </div>
 
         <!-- 결과 화면 -->
-        <div id="result-screen" class="hidden p-6 flex-grow overflow-y-auto">
-            <div class="text-center mb-8">
-                <h2 class="text-2xl font-black text-slate-800">결과 리포트</h2>
-                <div class="text-4xl font-black text-indigo-600 my-4" id="score-display">0 / 10</div>
+        <div id="result-screen" class="hidden flex flex-col flex-grow overflow-hidden">
+            <div class="p-6 overflow-y-auto flex-grow pb-32">
+                <div class="text-center mb-10 pt-4">
+                    <h2 class="text-xl font-black text-slate-800 mb-2">결과 리포트</h2>
+                    <div class="inline-block bg-indigo-600 text-white px-8 py-3 rounded-3xl font-black text-3xl shadow-xl shadow-indigo-100" id="score-display">
+                        0 / 10
+                    </div>
+                </div>
+                
+                <div id="review-list" class="space-y-4"></div>
             </div>
-            <div id="review-list" class="space-y-4 mb-20"></div>
-            <div class="fixed bottom-0 left-0 right-0 p-6 bg-white border-t border-slate-100 max-w-[600px] mx-auto flex gap-3">
-                <button onclick="location.reload()" class="flex-1 py-4 bg-slate-100 text-slate-600 rounded-xl font-bold">홈으로</button>
-                <button onclick="startQuiz()" class="flex-1 py-4 bg-indigo-600 text-white rounded-xl font-bold shadow-lg">다시 풀기(새 문제)</button>
+
+            <!-- 하단 고정 버튼 -->
+            <div class="fixed bottom-0 left-0 right-0 p-6 bg-white/80 backdrop-blur-md border-t border-slate-100 max-w-[600px] mx-auto flex gap-3 z-50">
+                <button onclick="location.reload()" class="flex-1 py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold">홈으로</button>
+                <button onclick="startQuiz()" class="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-bold shadow-lg">다시 풀기</button>
             </div>
         </div>
     </div>
 
     <script>
-        // 실제 400문제를 이 배열에 추가하면 됩니다. 예시 문항 포함.
         const dbBank = [
             { q: "데이터베이스 시스템에서 데이터의 전체적인 논리적 구조를 무엇이라 하는가?", a: "스키마", r: "스키마는 DB의 설계도 역할을 합니다." },
             { q: "E-R 모델에서 다중 값 속성을 나타내는 기호는?", a: "이중 타원", r: "여러 값을 가질 수 있는 속성은 이중 타원입니다." },
@@ -68,8 +134,7 @@
             { q: "특정 열만 추출하는 관계대수 연산은?", a: "프로젝션", r: "Projection 연산은 파이 기호를 사용합니다." },
             { q: "두 릴레이션의 공통 속성을 기준으로 결합하는 연산은?", a: "조인", r: "Join 연산은 데이터를 결합합니다." },
             { q: "하나의 속성이 가질 수 있는 모든 원자값의 집합은?", a: "도메인", r: "도메인은 속성의 값 범위를 정의합니다." },
-            { q: "릴레이션의 행(Row) 수를 무엇이라 하는가?", a: "카디널리티", r: "행의 수는 카디널리티, 열의 수는 차수입니다." },
-            // ... 400문제까지 확장 가능
+            { q: "릴레이션의 행(Row) 수를 무엇이라 하는가?", a: "카디널리티", r: "행의 수는 카디널리티, 열의 수는 차수입니다." }
         ];
 
         let currentIdx = 0, score = 0, quizPool = [], userAnswers = [];
@@ -96,39 +161,74 @@
             document.getElementById('progress-bar').style.width = `${((currentIdx + 1) / 10) * 100}%`;
             document.getElementById('progress-text').innerText = `${currentIdx + 1} / 10`;
             document.getElementById('q-text').innerText = q.q;
-            document.getElementById('ans-input').value = "";
-            document.getElementById('ans-input').focus();
+            
+            const input = document.getElementById('ans-input');
+            input.value = "";
+            // 모바일에서 키보드가 바로 올라오도록 유도 (브라우저 정책에 따라 다를 수 있음)
+            setTimeout(() => input.focus(), 300);
         }
 
         function handleNext() {
-            const userAns = document.getElementById('ans-input').value.trim();
+            const input = document.getElementById('ans-input');
+            const userAns = input.value.trim();
             const correct = quizPool[currentIdx].a;
-            const isCorrect = userAns.replace(/\s/g,"") === correct.replace(/\s/g,"");
+            
+            // 공백 제거 및 대소문자 무시 비교 (정확도 향상)
+            const isCorrect = userAns.replace(/\s/g,"").toLowerCase() === correct.replace(/\s/g,"").toLowerCase();
+            
             if(isCorrect) score++;
-            userAnswers.push({ q: quizPool[currentIdx].q, u: userAns, a: correct, r: quizPool[currentIdx].r, is: isCorrect });
+            userAnswers.push({ 
+                q: quizPool[currentIdx].q, 
+                u: userAns, 
+                a: correct, 
+                r: quizPool[currentIdx].r, 
+                is: isCorrect 
+            });
 
-            if(currentIdx < 9) { currentIdx++; showQuestion(); }
-            else { finish(); }
+            if(currentIdx < 9) { 
+                currentIdx++; 
+                showQuestion(); 
+            } else { 
+                finish(); 
+            }
         }
 
         function finish() {
             document.getElementById('quiz-screen').classList.add('hidden');
             document.getElementById('result-screen').classList.remove('hidden');
             document.getElementById('score-display').innerText = `${score} / 10`;
+            
             const list = document.getElementById('review-list');
             list.innerHTML = userAnswers.map((item, i) => `
-                <div class="p-4 rounded-xl border-2 ${item.is ? 'border-slate-100' : 'border-red-100 bg-red-50'} animate-slide-up">
-                    <p class="font-bold text-slate-800 mb-2">${i+1}. ${item.q}</p>
-                    <div class="text-sm">
-                        <p class="${item.is ? 'text-blue-600' : 'text-red-600'}">내 답변: ${item.u || '(미입력)'}</p>
-                        <p class="text-indigo-700 font-bold">정답: ${item.a}</p>
-                        <p class="text-slate-500 mt-1 text-xs">💡 ${item.r}</p>
+                <div class="p-5 rounded-2xl border-2 ${item.is ? 'border-slate-100 bg-white' : 'border-red-100 bg-red-50/50'} animate-slide-up">
+                    <p class="font-bold text-slate-800 mb-3 leading-tight">${i+1}. ${item.q}</p>
+                    <div class="grid grid-cols-1 gap-2 mb-3">
+                        <div class="p-3 rounded-xl ${item.is ? 'bg-indigo-50/50 text-indigo-700' : 'bg-red-100/50 text-red-700'} text-sm">
+                            <span class="font-bold block text-[10px] uppercase opacity-60 mb-1">Your Answer</span>
+                            ${item.u || '(미입력)'}
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-800 text-white text-sm">
+                            <span class="font-bold block text-[10px] uppercase opacity-60 mb-1">Correct Answer</span>
+                            ${item.a}
+                        </div>
                     </div>
+                    <p class="text-[11px] text-slate-500 bg-white/50 p-2 rounded-lg border border-dashed border-slate-200">
+                        <span class="font-bold text-slate-700">💡 해설:</span> ${item.r}
+                    </p>
                 </div>
             `).join('');
+            
+            // 결과 화면으로 넘어가면 맨 위로 스크롤
+            document.querySelector('#result-screen .overflow-y-auto').scrollTop = 0;
         }
 
-        document.getElementById('ans-input').onkeypress = (e) => { if(e.key === 'Enter') handleNext(); };
+        // 엔터키 처리
+        document.getElementById('ans-input').addEventListener('keypress', (e) => { 
+            if(e.key === 'Enter') {
+                e.preventDefault(); // 모바일 폼 제출 방지
+                handleNext(); 
+            }
+        });
     </script>
 </body>
 </html>
