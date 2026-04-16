@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DB 중간고사 주관식 마스터</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8fafc; touch-action: manipulation; }
+        .hidden { display: none; }
+        .quiz-card { width: 100%; max-width: 600px; margin: 0 auto; background: white; min-height: 100vh; display: flex; flex-direction: column; }
+        @media (min-width: 640px) { .quiz-card { min-height: auto; margin-top: 2rem; margin-bottom: 2rem; border-radius: 1.5rem; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); } }
+        .progress-bar { transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-slide-up { animation: slideUp 0.4s ease forwards; }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <div class="quiz-card shadow-lg">
+        <!-- 시작 화면 -->
+        <div id="setup-screen" class="p-10 text-center">
+            <h1 class="text-3xl font-black text-slate-800 mb-4">DB 주관식 마스터</h1>
+            <p class="text-slate-500 mb-8 text-sm">3장~6장 핵심 이론 및 예상 문제<br>총 400+ 문항 풀에서 랜덤 10문제 추출</p>
+            <button onclick="startQuiz()" class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold text-lg shadow-lg hover:bg-indigo-700 transition-all">학습 시작하기</button>
+        </div>
+
+        <!-- 퀴즈 화면 -->
+        <div id="quiz-screen" class="hidden flex flex-col flex-grow">
+            <div class="h-1.5 w-full bg-slate-100"><div id="progress-bar" class="progress-bar h-full bg-indigo-500 w-0"></div></div>
+            <div class="px-6 py-4 flex justify-between items-center border-b border-slate-100">
+                <span class="text-[10px] font-black uppercase tracking-widest bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded">DATABASE</span>
+                <span id="progress-text" class="text-xs font-bold text-slate-400">01 / 10</span>
+                <button onclick="location.reload()" class="text-slate-400">✕</button>
+            </div>
+            <div class="p-6 flex-grow">
+                <h2 id="q-text" class="text-lg font-bold text-slate-800 leading-snug mb-6"></h2>
+                <input type="text" id="ans-input" autocomplete="off" placeholder="정답 입력" class="w-full p-4 border-2 border-slate-200 rounded-xl outline-none focus:border-indigo-500">
+            </div>
+            <div class="p-6 bg-white border-t border-slate-100">
+                <button onclick="handleNext()" id="action-btn" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold">다음 문제</button>
+            </div>
+        </div>
+
+        <!-- 결과 화면 -->
+        <div id="result-screen" class="hidden p-6 flex-grow overflow-y-auto">
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-black text-slate-800">결과 리포트</h2>
+                <div class="text-4xl font-black text-indigo-600 my-4" id="score-display">0 / 10</div>
+            </div>
+            <div id="review-list" class="space-y-4 mb-20"></div>
+            <div class="fixed bottom-0 left-0 right-0 p-6 bg-white border-t border-slate-100 max-w-[600px] mx-auto flex gap-3">
+                <button onclick="location.reload()" class="flex-1 py-4 bg-slate-100 text-slate-600 rounded-xl font-bold">홈으로</button>
+                <button onclick="startQuiz()" class="flex-1 py-4 bg-indigo-600 text-white rounded-xl font-bold shadow-lg">다시 풀기(새 문제)</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 실제 400문제를 이 배열에 추가하면 됩니다. 예시 문항 포함.
+        const dbBank = [
+            { q: "데이터베이스 시스템에서 데이터의 전체적인 논리적 구조를 무엇이라 하는가?", a: "스키마", r: "스키마는 DB의 설계도 역할을 합니다." },
+            { q: "E-R 모델에서 다중 값 속성을 나타내는 기호는?", a: "이중 타원", r: "여러 값을 가질 수 있는 속성은 이중 타원입니다." },
+            { q: "릴레이션에서 튜플을 유일하게 식별할 수 있는 최소한의 속성 집합은?", a: "후보키", r: "유일성과 최소성을 만족해야 합니다." },
+            { q: "기본키는 NULL이 될 수 없다는 제약조건은?", a: "개체 무결성", r: "개체 무결성 제약조건은 기본키에 적용됩니다." },
+            { q: "외래키가 참조하는 기본키 값과 일치해야 한다는 제약조건은?", a: "참조 무결성", r: "외래키는 참조 대상이 존재하거나 NULL이어야 합니다." },
+            { q: "조건을 만족하는 행을 추출하는 관계대수 연산은?", a: "셀렉션", r: "Selection 연산은 시그마 기호를 사용합니다." },
+            { q: "특정 열만 추출하는 관계대수 연산은?", a: "프로젝션", r: "Projection 연산은 파이 기호를 사용합니다." },
+            { q: "두 릴레이션의 공통 속성을 기준으로 결합하는 연산은?", a: "조인", r: "Join 연산은 데이터를 결합합니다." },
+            { q: "하나의 속성이 가질 수 있는 모든 원자값의 집합은?", a: "도메인", r: "도메인은 속성의 값 범위를 정의합니다." },
+            { q: "릴레이션의 행(Row) 수를 무엇이라 하는가?", a: "카디널리티", r: "행의 수는 카디널리티, 열의 수는 차수입니다." },
+            // ... 400문제까지 확장 가능
+        ];
+
+        let currentIdx = 0, score = 0, quizPool = [], userAnswers = [];
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function startQuiz() {
+            currentIdx = 0; score = 0; userAnswers = [];
+            quizPool = shuffle([...dbBank]).slice(0, 10);
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = quizPool[currentIdx];
+            document.getElementById('progress-bar').style.width = `${((currentIdx + 1) / 10) * 100}%`;
+            document.getElementById('progress-text').innerText = `${currentIdx + 1} / 10`;
+            document.getElementById('q-text').innerText = q.q;
+            document.getElementById('ans-input').value = "";
+            document.getElementById('ans-input').focus();
+        }
+
+        function handleNext() {
+            const userAns = document.getElementById('ans-input').value.trim();
+            const correct = quizPool[currentIdx].a;
+            const isCorrect = userAns.replace(/\s/g,"") === correct.replace(/\s/g,"");
+            if(isCorrect) score++;
+            userAnswers.push({ q: quizPool[currentIdx].q, u: userAns, a: correct, r: quizPool[currentIdx].r, is: isCorrect });
+
+            if(currentIdx < 9) { currentIdx++; showQuestion(); }
+            else { finish(); }
+        }
+
+        function finish() {
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            document.getElementById('score-display').innerText = `${score} / 10`;
+            const list = document.getElementById('review-list');
+            list.innerHTML = userAnswers.map((item, i) => `
+                <div class="p-4 rounded-xl border-2 ${item.is ? 'border-slate-100' : 'border-red-100 bg-red-50'} animate-slide-up">
+                    <p class="font-bold text-slate-800 mb-2">${i+1}. ${item.q}</p>
+                    <div class="text-sm">
+                        <p class="${item.is ? 'text-blue-600' : 'text-red-600'}">내 답변: ${item.u || '(미입력)'}</p>
+                        <p class="text-indigo-700 font-bold">정답: ${item.a}</p>
+                        <p class="text-slate-500 mt-1 text-xs">💡 ${item.r}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('ans-input').onkeypress = (e) => { if(e.key === 'Enter') handleNext(); };
+    </script>
+</body>
+</html>
