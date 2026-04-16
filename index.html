@@ -3,90 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DB 중간고사 주관식 마스터</title>
+    <title>DB 중간고사 주관식 마스터 (30제)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
-        
-        body { 
-            font-family: 'Noto Sans KR', sans-serif; 
-            background-color: #f8fafc; 
-            touch-action: manipulation;
-            -webkit-overflow-scrolling: touch;
-        }
-        
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8fafc; touch-action: manipulation; }
         .hidden { display: none !important; }
-        
-        /* 모바일에서는 꽉 차게, PC에서는 카드 형태로 */
-        .quiz-card { 
-            width: 100%; 
-            max-width: 600px; 
-            margin: 0 auto; 
-            background: white; 
-            min-height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            position: relative;
-        }
-        
-        @media (min-width: 640px) { 
-            .quiz-card { 
-                min-height: 700px; 
-                height: auto;
-                margin-top: 2rem; 
-                margin-bottom: 2rem; 
-                border-radius: 1.5rem; 
-                box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); 
-            } 
-        }
-
+        .quiz-card { width: 100%; max-width: 600px; margin: 0 auto; background: white; min-height: 100vh; display: flex; flex-direction: column; position: relative; }
+        @media (min-width: 640px) { .quiz-card { min-height: 700px; height: auto; margin-top: 2rem; margin-bottom: 2rem; border-radius: 1.5rem; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); } }
         .progress-bar { transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        
-        @keyframes slideUp { 
-            from { opacity: 0; transform: translateY(20px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-slide-up { animation: slideUp 0.4s ease forwards; }
-
-        /* 터치 피드백 */
         button:active { transform: scale(0.98); }
-        input:focus { font-size: 16px; } /* iOS 자동 줌 방지 */
+        input:focus { font-size: 16px; }
     </style>
 </head>
 <body class="bg-slate-50">
     <div class="quiz-card">
-        <!-- 시작 화면 -->
         <div id="setup-screen" class="p-8 text-center flex flex-col justify-center flex-grow">
             <div class="mb-6 inline-block p-4 bg-indigo-50 rounded-2xl mx-auto">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
                 </svg>
             </div>
-            <h1 class="text-3xl font-black text-slate-800 mb-4 tracking-tight">DB 주관식 마스터</h1>
+            <h1 class="text-3xl font-black text-slate-800 mb-4 tracking-tight">DB 주관식 30제</h1>
             <p class="text-slate-500 mb-10 text-sm leading-relaxed">
-                3장~6장 핵심 이론 및 예상 문제<br>
-                총 400+ 문항 풀에서 랜덤 10문제 추출
+                3장~6장 핵심 이론 종합 문제 은행<br>
+                다시 풀기 시 30문제 중 랜덤 10문제가 출제됩니다.
             </p>
             <button onclick="startQuiz()" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-bold text-lg shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all">
                 학습 시작하기
             </button>
         </div>
 
-        <!-- 퀴즈 화면 -->
         <div id="quiz-screen" class="hidden flex flex-col flex-grow">
-            <div class="h-1.5 w-full bg-slate-100">
-                <div id="progress-bar" class="progress-bar h-full bg-indigo-500 w-0"></div>
-            </div>
-            
+            <div class="h-1.5 w-full bg-slate-100"><div id="progress-bar" class="progress-bar h-full bg-indigo-500 w-0"></div></div>
             <div class="px-6 py-4 flex justify-between items-center border-b border-slate-50">
                 <span class="text-[10px] font-black uppercase tracking-widest bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded">DATABASE</span>
                 <span id="progress-text" class="text-xs font-bold text-slate-400">01 / 10</span>
                 <button onclick="location.reload()" class="p-2 text-slate-300 hover:text-slate-500 transition">✕</button>
             </div>
-
             <div class="p-6 flex-grow flex flex-col justify-center">
                 <div class="bg-slate-50 p-5 rounded-2xl mb-8 border border-slate-100">
-                    <h2 id="q-text" class="text-xl font-bold text-slate-800 leading-snug"></h2>
+                    <h2 id="q-text" class="text-xl font-bold text-slate-800 leading-snug break-keep"></h2>
                 </div>
                 <div class="space-y-2">
                     <label class="text-xs font-bold text-slate-400 ml-1">ANSWER</label>
@@ -94,7 +53,6 @@
                            class="w-full p-5 border-2 border-slate-200 rounded-2xl outline-none focus:border-indigo-500 focus:bg-white bg-slate-50 transition-all text-lg">
                 </div>
             </div>
-
             <div class="p-6 bg-white border-t border-slate-100">
                 <button onclick="handleNext()" id="action-btn" class="w-full bg-slate-900 text-white py-5 rounded-2xl font-bold text-lg shadow-lg active:bg-black transition-colors">
                     다음 문제
@@ -102,20 +60,14 @@
             </div>
         </div>
 
-        <!-- 결과 화면 -->
         <div id="result-screen" class="hidden flex flex-col flex-grow overflow-hidden">
             <div class="p-6 overflow-y-auto flex-grow pb-32">
                 <div class="text-center mb-10 pt-4">
                     <h2 class="text-xl font-black text-slate-800 mb-2">결과 리포트</h2>
-                    <div class="inline-block bg-indigo-600 text-white px-8 py-3 rounded-3xl font-black text-3xl shadow-xl shadow-indigo-100" id="score-display">
-                        0 / 10
-                    </div>
+                    <div class="inline-block bg-indigo-600 text-white px-8 py-3 rounded-3xl font-black text-3xl shadow-xl shadow-indigo-100" id="score-display">0 / 10</div>
                 </div>
-                
                 <div id="review-list" class="space-y-4"></div>
             </div>
-
-            <!-- 하단 고정 버튼 -->
             <div class="fixed bottom-0 left-0 right-0 p-6 bg-white/80 backdrop-blur-md border-t border-slate-100 max-w-[600px] mx-auto flex gap-3 z-50">
                 <button onclick="location.reload()" class="flex-1 py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold">홈으로</button>
                 <button onclick="startQuiz()" class="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-bold shadow-lg">다시 풀기</button>
@@ -125,16 +77,43 @@
 
     <script>
         const dbBank = [
+            // 3장: 데이터 모델링 & E-R 모델
             { q: "데이터베이스 시스템에서 데이터의 전체적인 논리적 구조를 무엇이라 하는가?", a: "스키마", r: "스키마는 DB의 설계도 역할을 합니다." },
-            { q: "E-R 모델에서 다중 값 속성을 나타내는 기호는?", a: "이중 타원", r: "여러 값을 가질 수 있는 속성은 이중 타원입니다." },
-            { q: "릴레이션에서 튜플을 유일하게 식별할 수 있는 최소한의 속성 집합은?", a: "후보키", r: "유일성과 최소성을 만족해야 합니다." },
-            { q: "기본키는 NULL이 될 수 없다는 제약조건은?", a: "개체 무결성", r: "개체 무결성 제약조건은 기본키에 적용됩니다." },
-            { q: "외래키가 참조하는 기본키 값과 일치해야 한다는 제약조건은?", a: "참조 무결성", r: "외래키는 참조 대상이 존재하거나 NULL이어야 합니다." },
-            { q: "조건을 만족하는 행을 추출하는 관계대수 연산은?", a: "셀렉션", r: "Selection 연산은 시그마 기호를 사용합니다." },
-            { q: "특정 열만 추출하는 관계대수 연산은?", a: "프로젝션", r: "Projection 연산은 파이 기호를 사용합니다." },
-            { q: "두 릴레이션의 공통 속성을 기준으로 결합하는 연산은?", a: "조인", r: "Join 연산은 데이터를 결합합니다." },
-            { q: "하나의 속성이 가질 수 있는 모든 원자값의 집합은?", a: "도메인", r: "도메인은 속성의 값 범위를 정의합니다." },
-            { q: "릴레이션의 행(Row) 수를 무엇이라 하는가?", a: "카디널리티", r: "행의 수는 카디널리티, 열의 수는 차수입니다." }
+            { q: "E-R 모델에서 다중 값 속성을 나타내는 기호는?", a: "이중 타원", r: "여러 값을 가질 수 있는 속성은 이중 타원을 사용합니다." },
+            { q: "E-R 모델에서 개체 간의 연결을 나타내는 기호(다이아몬드)는?", a: "관계", r: "개체와 개체 사이의 연관성을 관계라고 합니다." },
+            { q: "E-R 모델의 구성 요소 중 속성이 가질 수 있는 값의 범위를 무엇이라 하는가?", a: "도메인", r: "데이터의 타입과 범위를 의미합니다." },
+            { q: "두 개 이상의 속성으로 구성된 속성을 무엇이라 하는가?", a: "복합 속성", r: "성명(성+이름)처럼 나눌 수 있는 속성입니다." },
+            { q: "다른 속성의 값으로부터 유도되어 결정되는 속성은?", a: "유도 속성", r: "점선 타원으로 표기하며 생년월일로부터 계산된 '나이' 등이 해당됩니다." },
+            { q: "E-R 모델에서 약한 개체와 강한 개체의 관계를 나타내는 선의 특징은?", a: "이중선", r: "의존적인 관계는 이중선으로 연결합니다." },
+            
+            // 4장: 관계 데이터 모델 (키 & 제약조건)
+            { q: "릴레이션에서 튜플을 유일하게 식별할 수 있는 최소한의 속성 집합은?", a: "후보키", r: "유일성과 최소성을 모두 만족해야 합니다." },
+            { q: "후보키 중에서 특별히 선정되어 NULL 값을 가질 수 없는 키는?", a: "기본키", r: "Primary Key로, 개체 무결성의 핵심입니다." },
+            { q: "기본키는 NULL이 될 수 없다는 제약조건은?", a: "개체 무결성", r: "기본키 값의 고유성과 존재를 보장합니다." },
+            { q: "외래키가 참조하는 기본키 값과 일치해야 한다는 제약조건은?", a: "참조 무결성", r: "존재하지 않는 데이터를 참조할 수 없게 합니다." },
+            { q: "릴레이션에서 행(Row)을 의미하는 용어는?", a: "튜플", r: "레코드라고도 불리는 데이터의 한 단위입니다." },
+            { q: "릴레이션에서 열(Column)을 의미하는 용어는?", a: "속성", r: "애트리뷰트라고도 합니다." },
+            { q: "릴레이션의 차수(Degree)는 무엇의 개수를 의미하는가?", a: "속성", r: "속성의 전체 개수가 차수입니다." },
+            { q: "릴레이션의 카디널리티(Cardinality)는 무엇의 개수를 의미하는가?", a: "튜플", r: "튜플의 전체 개수가 카디널리티입니다." },
+            { q: "어떤 릴레이션에서 다른 릴레이션의 기본키를 참조하는 속성은?", a: "외래키", r: "Foreign Key로 릴레이션 간 관계를 맺어줍니다." },
+            { q: "유일성은 만족하지만 최소성은 만족하지 못하는 키는?", a: "슈퍼키", r: "식별은 가능하지만 불필요한 속성이 포함된 키입니다." },
+
+            // 5장: 관계대수
+            { q: "조건을 만족하는 행(튜플)만 추출하는 관계대수 연산 기호는?", a: "셀렉션", r: "시그마(σ) 기호를 사용합니다." },
+            { q: "특정 열(속성)만 추출하는 관계대수 연산 기호는?", a: "프로젝션", r: "파이(π) 기호를 사용합니다." },
+            { q: "두 릴레이션의 공통 속성을 기준으로 결합하는 연산은?", a: "자연 조인", r: "조인 중 가장 일반적인 형태입니다." },
+            { q: "두 릴레이션의 모든 튜플을 결합하여 생성하는 연산은?", a: "카티션 프로덕트", r: "곱집합 연산으로 결과 수는 (n * m)이 됩니다." },
+            { q: "합집합, 교집합, 차집합 연산을 수행하기 위해 두 릴레이션이 갖춰야 할 조건은?", a: "합병 가능", r: "차수와 도메인이 같아야 합니다." },
+            { q: "관계대수 연산 중 릴레이션의 이름을 바꾸거나 속성명을 바꾸는 연산은?", a: "리네임", r: "로(ρ) 기호를 사용합니다." },
+            { q: "조인 조건에 만족하지 않는 튜플도 결과에 포함시키는 조인은?", a: "외부 조인", r: "Outer Join으로 NULL 값을 포함하여 출력합니다." },
+
+            // 6장: SQL 기초 (이론 중심)
+            { q: "데이터 정의어(DDL) 중 테이블을 생성할 때 사용하는 명령어는?", a: "CREATE", r: "구조를 정의하는 명령어입니다." },
+            { q: "데이터 조작어(DML) 중 데이터를 조회할 때 사용하는 명령어는?", a: "SELECT", r: "데이터를 검색하는 핵심 명령어입니다." },
+            { q: "데이터의 구조(스키마)를 변경할 때 사용하는 DDL 명령어는?", a: "ALTER", r: "컬럼 추가, 변경, 삭제 등에 사용합니다." },
+            { q: "데이터베이스의 변경 내용을 취소하고 이전 상태로 되돌리는 명령어는?", a: "ROLLBACK", r: "트랜잭션 제어어(TCL)에 해당합니다." },
+            { q: "기존 테이블을 삭제할 때 사용하는 DDL 명령어는?", a: "DROP", r: "구조 자체를 완전히 삭제합니다." },
+            { q: "SELECT 문에서 결과의 중복을 제거하기 위해 사용하는 키워드는?", a: "DISTINCT", r: "중복된 값을 하나만 출력하게 합니다." }
         ];
 
         let currentIdx = 0, score = 0, quizPool = [], userAnswers = [];
@@ -149,7 +128,9 @@
 
         function startQuiz() {
             currentIdx = 0; score = 0; userAnswers = [];
+            // 30문제 중 랜덤 10문제 추출
             quizPool = shuffle([...dbBank]).slice(0, 10);
+            
             document.getElementById('setup-screen').classList.add('hidden');
             document.getElementById('result-screen').classList.add('hidden');
             document.getElementById('quiz-screen').classList.remove('hidden');
@@ -164,7 +145,6 @@
             
             const input = document.getElementById('ans-input');
             input.value = "";
-            // 모바일에서 키보드가 바로 올라오도록 유도 (브라우저 정책에 따라 다를 수 있음)
             setTimeout(() => input.focus(), 300);
         }
 
@@ -173,7 +153,7 @@
             const userAns = input.value.trim();
             const correct = quizPool[currentIdx].a;
             
-            // 공백 제거 및 대소문자 무시 비교 (정확도 향상)
+            // 비교 시 공백 제거 및 소문자화
             const isCorrect = userAns.replace(/\s/g,"").toLowerCase() === correct.replace(/\s/g,"").toLowerCase();
             
             if(isCorrect) score++;
@@ -201,7 +181,7 @@
             const list = document.getElementById('review-list');
             list.innerHTML = userAnswers.map((item, i) => `
                 <div class="p-5 rounded-2xl border-2 ${item.is ? 'border-slate-100 bg-white' : 'border-red-100 bg-red-50/50'} animate-slide-up">
-                    <p class="font-bold text-slate-800 mb-3 leading-tight">${i+1}. ${item.q}</p>
+                    <p class="font-bold text-slate-800 mb-3 leading-tight break-keep">${i+1}. ${item.q}</p>
                     <div class="grid grid-cols-1 gap-2 mb-3">
                         <div class="p-3 rounded-xl ${item.is ? 'bg-indigo-50/50 text-indigo-700' : 'bg-red-100/50 text-red-700'} text-sm">
                             <span class="font-bold block text-[10px] uppercase opacity-60 mb-1">Your Answer</span>
@@ -218,14 +198,12 @@
                 </div>
             `).join('');
             
-            // 결과 화면으로 넘어가면 맨 위로 스크롤
             document.querySelector('#result-screen .overflow-y-auto').scrollTop = 0;
         }
 
-        // 엔터키 처리
         document.getElementById('ans-input').addEventListener('keypress', (e) => { 
             if(e.key === 'Enter') {
-                e.preventDefault(); // 모바일 폼 제출 방지
+                e.preventDefault();
                 handleNext(); 
             }
         });
